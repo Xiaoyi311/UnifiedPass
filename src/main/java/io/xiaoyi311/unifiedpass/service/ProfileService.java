@@ -4,8 +4,8 @@ import io.xiaoyi311.unifiedpass.OtherUtil;
 import io.xiaoyi311.unifiedpass.entity.User;
 import io.xiaoyi311.unifiedpass.entity.UserError;
 import io.xiaoyi311.unifiedpass.entity.yggdrasil.YggdrasilProfile;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +13,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -22,6 +21,7 @@ import java.util.UUID;
  * @author xiaoyi311
  */
 @Service
+@Slf4j
 public class ProfileService {
     @Autowired
     YggdrasilService yggdrasilService;
@@ -49,6 +49,7 @@ public class ProfileService {
 
             profile.setModel(model);
             yggdrasilService.saveProfile(profile);
+            log.info("Change Info: " + user.getUsername(), " -> " + model + ", " + username);
         }else{
             throw new UserError("lang:server.unknown_profile");
         }
@@ -78,7 +79,7 @@ public class ProfileService {
                 throw new UserError("lang:upload.unSafe");
             }
 
-            File folder = new File(System.getProperty("user.dir"), Path.of("texture", "skin").toString());
+            File folder = new File(System.getProperty("user.dir"), "texture");
             folder.mkdirs();
 
             YggdrasilProfile profile = yggdrasilService.getProfile(user.getProfile());
@@ -95,6 +96,7 @@ public class ProfileService {
 
             profile.setSkin(filename);
             yggdrasilService.saveProfile(profile);
+            log.info("Upload Skin: " + user.getUsername() + " -> " + filename);
         } catch (IOException e) {
             throw new UserError("lang:upload.fail");
         }

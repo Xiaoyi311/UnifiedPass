@@ -13,7 +13,7 @@ import java.util.List;
  * Yggdrasil 令牌表控制层
  * @author xiaoyi311
  */
-public interface TokenRepository extends JpaRepository<YggdrasilToken, Integer> {
+public interface TokenRepository extends JpaRepository<YggdrasilToken, String> {
     /**
      * 由 User UUID 获取 Token 数量
      * @param user User UUID
@@ -55,5 +55,5 @@ public interface TokenRepository extends JpaRepository<YggdrasilToken, Integer> 
      * 获取所有 Tokens
      * @return Tokens
      */
-    List<YggdrasilToken> getYggdrasilTokensByAccessTokenNotNull();
+    List<YggdrasilToken> findAll();
 }

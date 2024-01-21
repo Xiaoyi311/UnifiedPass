@@ -77,6 +77,9 @@ public class OtherUtil {
         } else if (body instanceof ClassCastException) {
             data.setStatus(400);
             data.setData("Wrong Args");
+        } else if (body instanceof IllegalArgumentException) {
+            data.setStatus(400);
+            data.setData("Wrong Args");
         } else if (body instanceof PermissionDeniedDataAccessException) {
             data.setStatus(403);
             data.setData("Permission Denied");

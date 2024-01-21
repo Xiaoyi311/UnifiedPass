@@ -355,7 +355,7 @@ public class YggdrasilService {
     @Scheduled(fixedDelay = TOKEN_INVALID_CHECK)
     public void cleanToken(){
         log.info("Cleaning Invalid Token...");
-        List<YggdrasilToken> tokens = tokenRepository.getYggdrasilTokensByAccessTokenNotNull();
+        List<YggdrasilToken> tokens = tokenRepository.findAll();
         for (YggdrasilToken token : tokens) {
             if(token.getTime() + TOKEN_OUT_DATE < System.currentTimeMillis()){
                 tokenRepository.delete(token);

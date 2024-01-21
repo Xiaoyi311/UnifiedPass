@@ -25,7 +25,7 @@ public class User implements Serializable {
      * id
      */
     @Id
-    public String id = UUID.randomUUID().toString();
+    public String id = UUID.randomUUID().toString().replaceAll("-", "");
 
     /**
      * 用户名

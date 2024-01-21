@@ -55,7 +55,7 @@ public class YggdrasilProfile implements Serializable {
      * 披风
      */
     @Column
-    public String cape;
+    public String capes;
 
     /**
      * 用户
@@ -126,9 +126,9 @@ public class YggdrasilProfile implements Serializable {
             textures.put("SKIN", skin);
         }
 
-        if(cape != null){
+        if(capes != null){
             JSONObject cape = new JSONObject();
-            cape.put("url", this.cape);
+            cape.put("url", website + "/textures/" + this.capes.split(",")[0]);
 
             textures.put("CAPE", cape);
         }

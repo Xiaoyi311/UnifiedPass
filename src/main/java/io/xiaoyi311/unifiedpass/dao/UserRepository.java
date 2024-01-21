@@ -9,14 +9,14 @@ import org.springframework.stereotype.Repository;
  * @author xiaoyi311
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, String> {
     /**
      * 是否存在指定用户
      * @param username 用户名
      * @param mojang 正版 UUID
      * @return 是否存在
      */
-    boolean existsUserByUsernameOrMojang(String username, String mojang);
+    boolean existsUserByUsernameIgnoreCaseOrMojang(String username, String mojang);
 
     /**
      * 由用户名获取用户

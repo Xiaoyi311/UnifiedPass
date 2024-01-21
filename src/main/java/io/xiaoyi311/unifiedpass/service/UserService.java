@@ -107,7 +107,7 @@ public class UserService {
             throw new UserError("lang:user.auth_code_invalid");
         }
 
-        if(userTable.existsUserByUsernameOrMojang(username, auth.getUuid())){
+        if(userTable.existsUserByUsernameIgnoreCaseOrMojang(username, auth.getUuid()) || profileRepository.existsByName(username)){
             throw new UserError("lang:user.exist");
         }
 

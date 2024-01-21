@@ -138,11 +138,11 @@ public class YggdrasilController {
      * @return 角色信息/204
      */
     @GetMapping("sessionserver/session/minecraft/profile/{uuid}")
-    public Object profile(@RequestParam Map<String, Object> args, @PathVariable(required = false) String uuid){
+    public Object profile(@RequestParam Map<String, String> args, @PathVariable(required = false) String uuid){
         try{
             YggdrasilProfile profile = yggdrasilService.getProfile(uuid);
             return profile == null ? HttpStatus.NO_CONTENT : profile.getJsonData(
-                    Boolean.parseBoolean((String) args.getOrDefault("unsigned", "true")) ?
+                    Boolean.parseBoolean(args.getOrDefault("unsigned", "true")) ?
                             "" : settingsService.get(ServerSetting.Settings.PrivateKey).getValue(),
                     settingsService.get(ServerSetting.Settings.Website).getValue()
             );

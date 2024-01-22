@@ -80,9 +80,9 @@ public class OtherUtil {
         } else if (body instanceof IllegalArgumentException) {
             data.setStatus(400);
             data.setData("Wrong Args");
-        } else if (body instanceof PermissionDeniedDataAccessException) {
+        } else if (body instanceof PermissionDeniedDataAccessException e) {
             data.setStatus(403);
-            data.setData("Permission Denied");
+            data.setData(e.getCause().getMessage());
         } else if (body instanceof ServletException e) {
             if(e.getCause() instanceof UserError error){
                 data.setStatus(200);

@@ -1,6 +1,7 @@
 package io.xiaoyi311.unifiedpass.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import io.xiaoyi311.unifiedpass.annotation.GoogleVerify;
 import io.xiaoyi311.unifiedpass.annotation.Permission;
 import io.xiaoyi311.unifiedpass.entity.ResponseData;
 import io.xiaoyi311.unifiedpass.entity.User;
@@ -28,6 +29,7 @@ public class AuthController {
      * @return OK
      */
     @PostMapping("register")
+    @GoogleVerify
     public HttpStatus register(
             @RequestBody JSONObject data
     ){
@@ -45,6 +47,7 @@ public class AuthController {
      * @return OK
      */
     @PostMapping("login")
+    @GoogleVerify
     public ResponseData login(
             @RequestBody JSONObject data,
             HttpServletRequest request

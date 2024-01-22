@@ -87,8 +87,8 @@ public class YggdrasilService {
         meta.put("feature.username_check", true);
 
         JSONObject links = new JSONObject();
-        links.put("homepage", domain + "/");
-        links.put("register", domain + "/register");
+        links.put("homepage", domain + "/#/");
+        links.put("register", domain + "/#/login");
 
         meta.put("links", links);
 

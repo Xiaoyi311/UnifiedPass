@@ -6,18 +6,16 @@ import io.xiaoyi311.unifiedpass.entity.yggdrasil.YggdrasilError;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.asn1.pkcs.RSAPrivateKey;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Signature;
-import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -125,11 +123,10 @@ public class OtherUtil {
     public static String rsaSign(String privateKeyStr, String data){
         try{
             privateKeyStr = privateKeyStr.replaceAll("\n", "");
-            privateKeyStr = privateKeyStr.replace("-----BEGIN RSA PRIVATE KEY-----", "");
-            privateKeyStr = privateKeyStr.replace("-----END RSA PRIVATE KEY-----", "");
+            privateKeyStr = privateKeyStr.replace("-----BEGIN PRIVATE KEY-----", "");
+            privateKeyStr = privateKeyStr.replace("-----END PRIVATE KEY-----", "");
             byte[] decodedBytes = Base64.getDecoder().decode(privateKeyStr);
-            RSAPrivateKey key = RSAPrivateKey.getInstance(decodedBytes);
-            RSAPrivateKeySpec spec = new RSAPrivateKeySpec(key.getModulus(), key.getPrivateExponent());
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decodedBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PrivateKey privateKey = keyFactory.generatePrivate(spec);
             Signature signature = Signature.getInstance("SHA1withRSA");

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -55,7 +56,7 @@ public class YggdrasilProfile implements Serializable {
      * 披风
      */
     @Column
-    public String capes;
+    public String capes = "NONE";
 
     /**
      * 用户
@@ -126,7 +127,7 @@ public class YggdrasilProfile implements Serializable {
             textures.put("SKIN", skin);
         }
 
-        if(capes != null){
+        if(!Objects.equals(this.capes.split(",")[0], "NONE")){
             JSONObject cape = new JSONObject();
             cape.put("url", website + "/textures/" + this.capes.split(",")[0]);
 

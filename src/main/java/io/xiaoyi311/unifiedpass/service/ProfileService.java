@@ -256,10 +256,17 @@ public class ProfileService {
         }
 
         List<Cape> result = new ArrayList<>();
-        if(profile.getCapes() != null) {
+        if(!Objects.equals(profile.getCapes(), "")) {
             for (String capeId : profile.getCapes().split(",")) {
-                Cape cape = capeRepository.getCapeByUuid(capeId);
-                result.add(cape);
+                if(!Objects.equals(capeId, "NONE")) {
+                    Cape cape = capeRepository.getCapeByUuid(capeId);
+                    result.add(cape);
+                }else{
+                    Cape none = new Cape();
+                    none.setType(Cape.CapeType.SPECIAL);
+                    none.setName("无披风");
+                    result.add(none);
+                }
             }
         }
 
@@ -305,7 +312,7 @@ public class ProfileService {
             throw new UserError("lang:profile.notFound");
         }
 
-        List<String> capes = profile.getCapes() == null ?
+        List<String> capes = Objects.equals(profile.getCapes(), "") ?
                 new ArrayList<>() :
                 new ArrayList<>(List.of(profile.getCapes().split(",")));
 

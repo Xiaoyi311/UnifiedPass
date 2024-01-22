@@ -41,7 +41,7 @@ public class ProfileController {
                 user,
                 (String) data.getOrDefault("model", ""),
                 (String) data.getOrDefault("username", ""),
-                (String) data.getOrDefault("cape", "")
+                (String) data.getOrDefault("cape", "none")
         );
         return HttpStatus.NO_CONTENT;
     }

@@ -38,7 +38,10 @@ public class UserService {
     ProfileRepository profileRepository;
 
     @Autowired
-    RedisTemplate<String, AuthCode> redisTemplate;
+    RedisTemplate<String, String> redisTemplate;
+
+    @Autowired
+    MicrosoftService microsoftService;
 
     Map<String, BanUser> banUserList = new HashMap<>();
 
@@ -91,9 +94,9 @@ public class UserService {
      * 注册账户
      * @param username 用户名
      * @param password 密码
-     * @param code 授权码
+     * @param miAccess 微软 Token
      */
-    public void register(String username, String password, Integer code){
+    public void register(String username, String password, String miAccess){
         if(username.length() <= 5 || username.length() > 20 && OtherUtil.isValidStr(username)){
             throw new UserError("lang:user.username_invalid");
         }
@@ -102,12 +105,12 @@ public class UserService {
             throw new UserError("lang:user.password_invalid");
         }
 
-        AuthCode auth = redisTemplate.opsForValue().get("authCode:" + code);
-        if(auth == null){
-            throw new UserError("lang:user.auth_code_invalid");
+        String uuid = microsoftService.getMinecraftUuid(miAccess);
+        if(uuid == null){
+            throw new UserError("lang:user.online_invalid");
         }
 
-        if(userTable.existsUserByUsernameIgnoreCaseOrMojang(username, auth.getUuid()) || profileRepository.existsByName(username)){
+        if(userTable.existsUserByUsernameIgnoreCaseOrMojang(username, uuid) || profileRepository.existsByName(username)){
             throw new UserError("lang:user.exist");
         }
 
@@ -118,9 +121,8 @@ public class UserService {
 
         user.setUsername(username);
         user.setPassword(OtherUtil.sha256(password));
-        user.setMojang(auth.getUuid());
+        user.setMojang(uuid);
         user.setProfile(profile.getUuid());
-        redisTemplate.delete("authCode:" + code);
 
         log.info("User Register: " + user.username);
         userTable.save(user);
@@ -181,16 +183,5 @@ public class UserService {
          * 封禁时间
          */
         private long unix;
-    }
-
-    /**
-     * 授权码
-     */
-    @Data
-    public static class AuthCode {
-        /**
-         * Mojang UUID
-         */
-        private String uuid;
     }
 }

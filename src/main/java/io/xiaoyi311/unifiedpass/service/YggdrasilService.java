@@ -122,7 +122,7 @@ public class YggdrasilService {
         }
 
         YggdrasilToken token = tokenRepository.getYggdrasilTokenByAccessToken(check.getAccessToken());
-        if(token == null || !token.isTempInvalid()){
+        if(token == null || token.isTempInvalid()){
             return null;
         }
 
@@ -157,7 +157,7 @@ public class YggdrasilService {
         }
 
         YggdrasilToken token = tokenRepository.getYggdrasilTokenByAccessToken(accessToken);
-        if(token == null || !token.isTempInvalid()){
+        if(token == null || token.isTempInvalid()){
             throw YggdrasilError.Errors.TOKEN_INVALID.getMsg();
         }
 

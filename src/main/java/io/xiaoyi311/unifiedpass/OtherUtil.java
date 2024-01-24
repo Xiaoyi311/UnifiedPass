@@ -1,5 +1,7 @@
 package io.xiaoyi311.unifiedpass;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import io.xiaoyi311.unifiedpass.entity.ResponseData;
 import io.xiaoyi311.unifiedpass.entity.UserError;
 import io.xiaoyi311.unifiedpass.entity.yggdrasil.YggdrasilError;
@@ -10,6 +12,12 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -17,8 +25,10 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 工具类
@@ -138,6 +148,11 @@ public class OtherUtil {
         }
     }
 
+    /**
+     * 生成 SHA256
+     * @param data 数据
+     * @return SHA256
+     */
     public static String sha256(String data){
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -155,5 +170,57 @@ public class OtherUtil {
         }catch (Exception e){
             return "=== ERROR ENCODE SHA256 ===";
         }
+    }
+
+    /**
+     * POST 带参请求
+     * @author xiaoyi311
+     */
+    public static JSONObject postArgs(String url, Map<String, String> args){
+        String form = args.entrySet()
+                .stream()
+                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
+
+        HttpClient cli = HttpClient.newHttpClient();
+        HttpResponse<String> response;
+        try {
+            response = cli.send(
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header("Content-Type", "application/x-www-form-urlencoded")
+                            .POST(HttpRequest.BodyPublishers.ofString(form))
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+        } catch (IOException | InterruptedException e) {
+            return null;
+        }
+
+        return JSON.parseObject(response.body());
+    }
+
+    /**
+     * POST 带 JSON 请求
+     * @author xiaoyi311
+     */
+    public static JSONObject postJson(String url, String json){
+        HttpClient cli = HttpClient.newHttpClient();
+        HttpResponse<String> response;
+        try {
+            response = cli.send(
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .header("Content-Type", "application/json")
+                            .header("Accept", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(json))
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+        } catch (IOException | InterruptedException e) {
+            return null;
+        }
+
+        return JSON.parseObject(response.body());
     }
 }

@@ -4,7 +4,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 import com.alibaba.fastjson.support.spring.FastJsonRedisSerializer;
-import io.xiaoyi311.unifiedpass.service.UserService;
 import io.xiaoyi311.unifiedpass.service.YggdrasilService;
 import jakarta.servlet.MultipartConfigElement;
 import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
@@ -54,18 +53,6 @@ public class ApplicationConfig implements WebMvcConfigurer {
         redisTemplate.setConnectionFactory(factory);
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new FastJsonRedisSerializer<>(YggdrasilService.SessionCheck.class));
-        return redisTemplate;
-    }
-
-    /**
-     * Redis 数据配置
-     */
-    @Bean
-    public RedisTemplate<String, UserService.AuthCode> redisTemplateAc(RedisConnectionFactory factory){
-        RedisTemplate<String, UserService.AuthCode> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(factory);
-        redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new FastJsonRedisSerializer<>(UserService.AuthCode.class));
         return redisTemplate;
     }
 

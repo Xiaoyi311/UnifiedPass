@@ -5,6 +5,7 @@ import io.xiaoyi311.unifiedpass.annotation.GoogleVerify;
 import io.xiaoyi311.unifiedpass.annotation.Permission;
 import io.xiaoyi311.unifiedpass.entity.ResponseData;
 import io.xiaoyi311.unifiedpass.entity.User;
+import io.xiaoyi311.unifiedpass.service.MicrosoftService;
 import io.xiaoyi311.unifiedpass.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * 身份验证控制器
@@ -22,6 +25,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MicrosoftService microsoftService;
 
     /**
      * 注册
@@ -36,7 +42,7 @@ public class AuthController {
         userService.register(
                 (String) data.getOrDefault("username", ""),
                 (String) data.getOrDefault("password", ""),
-                (Integer) data.getOrDefault("code", 0)
+                (String) data.getOrDefault("mi_access", "")
         );
         return HttpStatus.NO_CONTENT;
     }
@@ -84,5 +90,26 @@ public class AuthController {
             User user
     ){
         return user;
+    }
+
+    /**
+     * 微软登陆请求
+     * @return 登录代码
+     */
+    @GoogleVerify
+    //@GetMapping("miOauth")
+    public ResponseData miOauth(){
+        return ResponseData.deafult(microsoftService.spawnCode());
+    }
+
+    /**
+     * 微软登陆请求状态
+     * @return 登录代码
+     */
+    //@GetMapping("miOauthStatus")
+    public ResponseData miOauthStatus(@RequestParam Map<String, String> args){
+        return ResponseData.deafult(microsoftService.checkCode(
+                args.getOrDefault("code", "")
+        ));
     }
 }

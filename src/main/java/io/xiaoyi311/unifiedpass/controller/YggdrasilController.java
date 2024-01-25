@@ -19,7 +19,7 @@ import java.util.UUID;
  * @author xiaoyi311
  */
 @RestController
-@RequestMapping("/api/yggdrasil/")
+@RequestMapping("/api/yggdrasil")
 public class YggdrasilController {
     @Autowired
     YggdrasilService yggdrasilService;

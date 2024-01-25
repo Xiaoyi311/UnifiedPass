@@ -332,11 +332,10 @@ public class YggdrasilService {
                 JSONObject root = new JSONObject();
                 root.put("accessToken", token.accessToken);
                 root.put("clientToken", token.clientToken);
-                JSONObject profile = profileRepository.getYggdrasilProfileByUuid(user.getProfile()).getJsonData("", settingsService.get(ServerSetting.Settings.Website).getValue());
                 JSONArray ava = new JSONArray();
-                ava.add(profile);
+                ava.add(profileRepository.getYggdrasilProfileByUuid(user.getProfile()).getJsonData("", settingsService.get(ServerSetting.Settings.Website).getValue()));
                 root.put("availableProfiles", ava);
-                root.put("selectedProfile", profile);
+                root.put("selectedProfile", profileRepository.getYggdrasilProfileByUuid(user.getProfile()).getJsonData("", settingsService.get(ServerSetting.Settings.Website).getValue()));
                 if(requestUser){
                     root.put("user", user.getJsonData());
                 }

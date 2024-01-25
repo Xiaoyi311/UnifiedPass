@@ -92,7 +92,7 @@ public class YggdrasilService {
 
         meta.put("links", links);
 
-        JSONArray skinDomains = new JSONArray(List.of(domain));
+        JSONArray skinDomains = new JSONArray(List.of(domain.replace("http://", "").replace("https://", "")));
         root.put("meta", meta);
         root.put("skinDomains", skinDomains);
         root.put("signaturePublickey", settingsService.get(ServerSetting.Settings.PublicKey).value);
@@ -332,8 +332,11 @@ public class YggdrasilService {
                 JSONObject root = new JSONObject();
                 root.put("accessToken", token.accessToken);
                 root.put("clientToken", token.clientToken);
-                root.put("availableProfiles", new JSONArray());
-                root.put("selectedProfile", profileRepository.getYggdrasilProfileByUuid(user.getProfile()).getJsonData("", settingsService.get(ServerSetting.Settings.Website).getValue()));
+                JSONObject profile = profileRepository.getYggdrasilProfileByUuid(user.getProfile()).getJsonData("", settingsService.get(ServerSetting.Settings.Website).getValue());
+                JSONArray ava = new JSONArray();
+                ava.add(profile);
+                root.put("availableProfiles", ava);
+                root.put("selectedProfile", profile);
                 if(requestUser){
                     root.put("user", user.getJsonData());
                 }

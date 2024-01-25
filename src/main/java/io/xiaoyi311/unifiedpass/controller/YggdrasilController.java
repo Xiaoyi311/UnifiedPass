@@ -54,7 +54,6 @@ public class YggdrasilController {
                     request
             );
         }catch (Exception e){
-            e.printStackTrace();
             return HttpStatus.BAD_REQUEST;
         }
     }

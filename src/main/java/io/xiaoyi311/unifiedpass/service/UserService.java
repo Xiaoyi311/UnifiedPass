@@ -69,13 +69,7 @@ public class UserService {
     public void login(String username, String password, Boolean persistent, HttpServletRequest request){
         User user = banUserCheck(username);
 
-        if(username.length() <= 5 || username.length() > 20 && OtherUtil.isValidStr(username)){
-            throw new UserError("lang:user.username_invalid");
-        }
-
-        if(password.length() != 32 && OtherUtil.isValidStr(password)){
-            throw new UserError("lang:user.password_invalid");
-        }
+        userUpCheck(username, password);
 
         if(user != null && Objects.equals(user.getPassword(), OtherUtil.sha256(password))){
             log.info("User Login: " + username);
@@ -91,19 +85,42 @@ public class UserService {
     }
 
     /**
+     * 修改用户信息
+     * @param username 用户名
+     * @param passwordOld 旧密码
+     * @param passwordNew 新密码
+     * @param user 用户
+     */
+    public void setInfo(String username, String passwordOld, String passwordNew, User user){
+        if(username.length() <= 5 || username.length() > 20 || !OtherUtil.isValidStr(username)){
+            throw new UserError("lang:user.username_invalid");
+        }
+
+        if(!Objects.equals(passwordOld, "")) {
+            if(passwordNew.length() <= 5 || passwordNew.length() > 20){
+                throw new UserError("lang:user.password_invalid");
+            }
+
+            if(!OtherUtil.sha256(passwordOld).equals(user.getPassword())){
+                throw new UserError("lang:user.password_wrong");
+            }
+        }
+
+        user.setUsername(username);
+        if(!Objects.equals(passwordOld, "")){
+            user.setPassword(OtherUtil.sha256(passwordNew));
+        }
+        userTable.save(user);
+    }
+
+    /**
      * 注册账户
      * @param username 用户名
      * @param password 密码
      * @param miAccess 微软 Token
      */
     public void register(String username, String password, String miAccess){
-        if(username.length() <= 5 || username.length() > 20 && OtherUtil.isValidStr(username)){
-            throw new UserError("lang:user.username_invalid");
-        }
-
-        if(password.length() != 32 && OtherUtil.isValidStr(password)){
-            throw new UserError("lang:user.password_invalid");
-        }
+        userUpCheck(username, password);
 
         String uuid = microsoftService.getMinecraftUuid(miAccess);
         if(uuid == null){
@@ -166,6 +183,19 @@ public class UserService {
         }
 
         return user;
+    }
+
+    /**
+     * 用户用户名与密码检查
+     */
+    private void userUpCheck(String username, String password){
+        if(username.length() <= 5 || username.length() > 20 || !OtherUtil.isValidStr(username)){
+            throw new UserError("lang:user.username_invalid");
+        }
+
+        if(password.length() <= 5 || password.length() > 20){
+            throw new UserError("lang:user.password_invalid");
+        }
     }
 
     /**

@@ -62,7 +62,7 @@ public class OtherUtil {
      * @return 是否有效
      */
     public static boolean isValidStr(String str) {
-        String pattern = "^[a-zA-Z_][a-zA-Z0-9_]$";
+        String pattern = "^[a-zA-Z0-9_]+$";
 
         Pattern regexPattern = Pattern.compile(pattern);
         Matcher matcher = regexPattern.matcher(str);

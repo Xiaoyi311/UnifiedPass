@@ -32,7 +32,7 @@ public class AuthController {
     /**
      * 注册
      * @param data 数据
-     * @return OK
+     * @return 204
      */
     @PostMapping("register")
     @GoogleVerify
@@ -48,12 +48,34 @@ public class AuthController {
     }
 
     /**
+     * 修改用户信息
+     * @param data 数据
+     * @param user 用户
+     * @return 204
+     */
+    @PostMapping("setInfo")
+    @Permission
+    public HttpStatus setInfo(
+            @RequestBody JSONObject data,
+            User user
+    ){
+        userService.setInfo(
+                (String) data.getOrDefault("username", ""),
+                (String) data.getOrDefault("password_old", ""),
+                (String) data.getOrDefault("password_new", ""),
+                user
+        );
+        return HttpStatus.NO_CONTENT;
+    }
+
+    /**
      * 登陆
      * @param data 数据
+     * @param request 请求信息
      * @return OK
      */
     @PostMapping("login")
-    @GoogleVerify
+    //@GoogleVerify
     public ResponseData login(
             @RequestBody JSONObject data,
             HttpServletRequest request
@@ -69,7 +91,8 @@ public class AuthController {
 
     /**
      * 登出
-     * @return OK
+     * @param request 请求信息
+     * @return 204
      */
     @GetMapping(value = "logout")
     public HttpStatus logout(
@@ -82,6 +105,7 @@ public class AuthController {
     /**
      * 账户信息<br>
      * 权限：普通
+     * @param user 用户
      * @return 用户信息序列化
      */
     @Permission
@@ -104,6 +128,7 @@ public class AuthController {
 
     /**
      * 微软登陆请求状态
+     * @param args 参数
      * @return 登录代码
      */
     //@GetMapping("miOauthStatus")

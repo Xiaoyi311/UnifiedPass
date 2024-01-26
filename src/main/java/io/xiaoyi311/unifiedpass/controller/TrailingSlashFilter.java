@@ -18,7 +18,7 @@ public class TrailingSlashFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         String path = httpRequest.getRequestURI();
-        if (path.endsWith("/")) {
+        if (path.contains("/api/yggdrasil") && path.endsWith("/")) {
             httpResponse.sendRedirect(path.substring(0, path.length() - 1));
             return;
         }

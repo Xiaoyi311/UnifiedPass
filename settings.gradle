@@ -1,3 +1,4 @@
 rootProject.name = 'UnifiedPass'
 include 'authServer'
+include 'UnifiedVerifyServer'
 

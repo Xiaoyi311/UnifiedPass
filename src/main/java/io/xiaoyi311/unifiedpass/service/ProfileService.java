@@ -280,8 +280,23 @@ public class ProfileService {
      * @param profile 被发放角色
      */
     public void sendCape(User user, String cape, String profile){
-        sbCape(cape, profile, true);
-        log.info("Send Cape: {} -> [{}: {}]", user.getId(), profile, cape);
+        String[] profiles = profile.split(",");
+        boolean isBad = false;
+        for (String p : profiles) {
+            try{
+                sbCape(cape, p, true);
+                log.info("Send Cape: {} -> [{}: {}]", user.getId(), p, cape);
+            }catch (Exception e){
+                if(profiles.length == 1){
+                    throw e;
+                }
+                isBad = true;
+                log.error("Send Cape Error: {} -> [{}: {}]", user.getId(), p, cape);
+            }
+        }
+        if(isBad){
+            throw new UserError("lang:cape.sendError");
+        }
     }
 
     /**
@@ -291,8 +306,23 @@ public class ProfileService {
      * @param profile 被收回角色
      */
     public void backCape(User user, String cape, String profile){
-        sbCape(cape, profile, false);
-        log.info("Back Cape: {} -> [{}: {}]", user.getId(), profile, cape);
+        String[] profiles = profile.split(",");
+        boolean isBad = false;
+        for (String p : profiles) {
+            try{
+                sbCape(cape, p, false);
+                log.info("Back Cape: {} -> [{}: {}]", user.getId(), p, cape);
+            }catch (Exception e){
+                if(profiles.length == 1){
+                    throw e;
+                }
+                isBad = true;
+                log.error("Back Cape Error: {} -> [{}: {}]", user.getId(), p, cape);
+            }
+        }
+        if(isBad){
+            throw new UserError("lang:cape.backError");
+        }
     }
 
     /**

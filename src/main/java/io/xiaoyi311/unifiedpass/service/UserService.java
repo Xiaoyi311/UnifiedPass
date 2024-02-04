@@ -119,7 +119,7 @@ public class UserService {
     public void register(String username, String password, String code){
         userUpCheck(username, password);
 
-        String uuid = redisTemplate.opsForValue().getAndDelete("authCode:" + code);
+        String uuid = redisTemplate.opsForValue().get("authCode:" + code);
         if(uuid == null){
             throw new UserError("lang:user.code_invalid");
         }
@@ -141,6 +141,7 @@ public class UserService {
         log.info("User Register: " + user.username);
         userTable.save(user);
         profileRepository.save(profile);
+        redisTemplate.delete("authCode:" + code);
     }
 
     /**

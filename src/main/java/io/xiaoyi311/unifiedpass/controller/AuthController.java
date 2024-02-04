@@ -26,9 +26,6 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private MicrosoftService microsoftService;
-
     /**
      * 注册
      * @param data 数据
@@ -42,7 +39,7 @@ public class AuthController {
         userService.register(
                 (String) data.getOrDefault("username", ""),
                 (String) data.getOrDefault("password", ""),
-                (String) data.getOrDefault("mi_access", "")
+                (String) data.getOrDefault("code", "")
         );
         return HttpStatus.NO_CONTENT;
     }
@@ -114,27 +111,5 @@ public class AuthController {
             User user
     ){
         return user;
-    }
-
-    /**
-     * 微软登陆请求
-     * @return 登录代码
-     */
-    @GoogleVerify
-    //@GetMapping("miOauth")
-    public ResponseData miOauth(){
-        return ResponseData.deafult(microsoftService.spawnCode());
-    }
-
-    /**
-     * 微软登陆请求状态
-     * @param args 参数
-     * @return 登录代码
-     */
-    //@GetMapping("miOauthStatus")
-    public ResponseData miOauthStatus(@RequestParam Map<String, String> args){
-        return ResponseData.deafult(microsoftService.checkCode(
-                args.getOrDefault("code", "")
-        ));
     }
 }

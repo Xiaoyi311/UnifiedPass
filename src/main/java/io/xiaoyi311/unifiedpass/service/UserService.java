@@ -40,9 +40,6 @@ public class UserService {
     @Autowired
     RedisTemplate<String, String> redisTemplate;
 
-    @Autowired
-    MicrosoftService microsoftService;
-
     Map<String, BanUser> banUserList = new HashMap<>();
 
     /**
@@ -117,14 +114,14 @@ public class UserService {
      * 注册账户
      * @param username 用户名
      * @param password 密码
-     * @param miAccess 微软 Token
+     * @param code 验证码
      */
-    public void register(String username, String password, String miAccess){
+    public void register(String username, String password, String code){
         userUpCheck(username, password);
 
-        String uuid = microsoftService.getMinecraftUuid(miAccess);
+        String uuid = redisTemplate.opsForValue().getAndDelete("authCode:" + code);
         if(uuid == null){
-            throw new UserError("lang:user.online_invalid");
+            throw new UserError("lang:user.code_invalid");
         }
 
         if(userTable.existsUserByUsernameIgnoreCaseOrMojang(username, uuid) || profileRepository.existsByName(username)){

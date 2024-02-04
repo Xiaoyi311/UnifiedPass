@@ -158,7 +158,7 @@ public class MicrosoftService {
     /**
      * 获取验证状态
      */
-    @Scheduled(fixedDelay = VERIFY_CHECK)
+    //@Scheduled(fixedDelay = VERIFY_CHECK)
     public void cleanToken(){
         for (Map.Entry<String, String> entry : verifying.entrySet()) {
             Map<String, String> args = new HashMap<>();

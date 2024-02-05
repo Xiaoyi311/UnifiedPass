@@ -11,8 +11,11 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SettingsService {
-    @Autowired
-    SettingRepository settingRepository;
+    final SettingRepository settingRepository;
+
+    public SettingsService(SettingRepository settingRepository) {
+        this.settingRepository = settingRepository;
+    }
 
     /**
      * 获取设置

@@ -31,4 +31,11 @@ public interface UserRepository extends JpaRepository<User, String> {
      * @return 用户
      */
     User getUserById(String id);
+
+    /**
+     * 是否存在指定正版记录
+     * @param mojang 正版 UUID
+     * @return 是否存在
+     */
+    boolean existsUserByMojang(String mojang);
 }

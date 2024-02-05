@@ -27,12 +27,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @Slf4j
 public class MicrosoftService {
-    @Autowired
-    RedisTemplate<String, String> redisTemplate;
+    final RedisTemplate<String, String> redisTemplate;
 
     static final long VERIFY_CHECK = 5 * 1000;
 
     Map<String, String> verifying = new ConcurrentHashMap<>();
+
+    public MicrosoftService(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     /**
      * 生成代码

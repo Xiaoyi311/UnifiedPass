@@ -61,13 +61,13 @@ public class OtherUtil {
      * @param str 字符串
      * @return 是否有效
      */
-    public static boolean isValidStr(String str) {
+    public static boolean isSuccessStr(String str) {
         String pattern = "^[a-zA-Z0-9_]+$";
 
         Pattern regexPattern = Pattern.compile(pattern);
         Matcher matcher = regexPattern.matcher(str);
 
-        return matcher.matches();
+        return !matcher.matches();
     }
 
     /**
@@ -101,14 +101,14 @@ public class OtherUtil {
             } else {
                 data.setStatus(500);
                 if(debug){
-                    e.printStackTrace();
+                    log.trace("Servlet Exception", e);
                 }
                 data.setData(e.getMessage());
             }
         } else if (body instanceof Exception e) {
             data.setStatus(500);
             if(debug){
-                e.printStackTrace();
+                log.trace("Servlet Exception", e);
             }
             data.setData(e.getMessage());
         } else if (body instanceof HttpStatus s) {

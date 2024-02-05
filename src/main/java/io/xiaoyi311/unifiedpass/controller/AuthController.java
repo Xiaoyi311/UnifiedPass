@@ -5,16 +5,10 @@ import io.xiaoyi311.unifiedpass.annotation.GoogleVerify;
 import io.xiaoyi311.unifiedpass.annotation.Permission;
 import io.xiaoyi311.unifiedpass.entity.ResponseData;
 import io.xiaoyi311.unifiedpass.entity.User;
-import io.xiaoyi311.unifiedpass.service.MicrosoftService;
 import io.xiaoyi311.unifiedpass.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * 身份验证控制器
@@ -23,8 +17,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
-    private UserService userService;
+    final UserService userService;
+
+    public AuthController(UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * 注册
@@ -83,7 +80,7 @@ public class AuthController {
                 (Boolean) data.getOrDefault("persistent", false),
                 request
         );
-        return ResponseData.deafult("OK");
+        return ResponseData.def("OK");
     }
 
     /**
@@ -111,5 +108,23 @@ public class AuthController {
             User user
     ){
         return user;
+    }
+
+    /**
+     * 创建 Uvs 验证码
+     * @param data 数据
+     * @param user 用户
+     * @return Uvs 验证码
+     */
+    @PostMapping("createUvs")
+    @Permission(true)
+    public ResponseData createUvs(
+            @RequestBody JSONObject data,
+            User user
+    ){
+        return ResponseData.def(userService.createUvs(
+                (String) data.getOrDefault("uuid", ""),
+                user
+        ));
     }
 }

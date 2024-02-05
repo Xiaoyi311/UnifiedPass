@@ -9,6 +9,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -23,11 +24,22 @@ import java.util.Map;
 @Slf4j
 @Component
 public class GoogleVerifyAspect {
-    @Autowired
-    HttpServletRequest request;
+    @Value("${devMode}")
+    private Boolean isDev;
+
+    final HttpServletRequest request;
+
+    public GoogleVerifyAspect(HttpServletRequest request) {
+        this.request = request;
+    }
 
     @Around("@annotation(verify)")
     public Object beforeMethod(ProceedingJoinPoint joinPoint, GoogleVerify verify) throws Throwable{
+        if(isDev){
+            log.warn("!!!!!!!!=Google Verify is disabled in dev mode=!!!!!!!!");
+            return joinPoint.proceed();
+        }
+
         String token = request.getHeader("Google_token");
         if(token == null){
             throw new PermissionDeniedDataAccessException("Request Recaptcha Verify", new UserError("lang:req_recaptcha"));

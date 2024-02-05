@@ -3,8 +3,6 @@ package io.xiaoyi311.unifiedpass.dao;
 import io.xiaoyi311.unifiedpass.entity.Cape;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 /**
  * 披风数据库控制层
  * @author xiaoyi311

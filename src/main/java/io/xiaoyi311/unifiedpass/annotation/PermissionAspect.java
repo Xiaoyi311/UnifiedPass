@@ -4,10 +4,12 @@ import io.xiaoyi311.unifiedpass.entity.User;
 import io.xiaoyi311.unifiedpass.entity.UserError;
 import io.xiaoyi311.unifiedpass.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.stereotype.Component;
 
@@ -17,19 +19,33 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
+@Slf4j
 public class PermissionAspect {
-    @Autowired
-    HttpServletRequest request;
+    @Value("${devMode}")
+    private Boolean isDev;
 
-    @Autowired
-    UserService userService;
+    final HttpServletRequest request;
+    final UserService userService;
+
+    public PermissionAspect(HttpServletRequest request, UserService userService) {
+        this.request = request;
+        this.userService = userService;
+    }
 
     @Around("@annotation(permission)")
     public Object beforeMethod(ProceedingJoinPoint joinPoint, Permission permission) throws Throwable {
         //权限检验
         User user = userService.getUserBySession(request);
-        if(user == null || permission.value() && !user.admin){
+        if(user == null){
             throw new PermissionDeniedDataAccessException("Permission Denied", new UserError("lang:no_permission"));
+        }
+
+        if(isDev){
+            log.warn("!!!!!!!!=Permission Verify is disabled in dev mode=!!!!!!!!");
+        }else{
+            if(permission.value() && !user.admin){
+                throw new PermissionDeniedDataAccessException("Permission Denied", new UserError("lang:no_permission"));
+            }
         }
 
         //尝试注入 User 类型的参数

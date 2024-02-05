@@ -23,7 +23,12 @@ public class ResponseData {
      */
     public Object data;
 
-    public static ResponseData deafult(Object data){
+    /**
+     * 生成返回数据
+     * @param data 返回数据
+     * @return 统一返回
+     */
+    public static ResponseData def(Object data){
         ResponseData rep = new ResponseData();
         rep.setData(data);
         rep.setStatus(200);

@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 角色服务
+ * Yggdrasil 服务
  * @author xiaoyi311
  */
 @Service
@@ -38,20 +37,19 @@ public class YggdrasilService {
     static final long TOKEN_INVALID_CHECK = 30 * 60 * 1000;
     static final long USER_TOKEN_MAX = 5;
 
-    @Autowired
-    SettingsService settingsService;
+    final SettingsService settingsService;
+    final TokenRepository tokenRepository;
+    final ProfileRepository profileRepository;
+    final UserService userService;
+    final RedisTemplate<String, SessionCheck> redisTemplate;
 
-    @Autowired
-    TokenRepository tokenRepository;
-
-    @Autowired
-    ProfileRepository profileRepository;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    RedisTemplate<String, SessionCheck> redisTemplate;
+    public YggdrasilService(SettingsService settingsService, TokenRepository tokenRepository, ProfileRepository profileRepository, UserService userService, RedisTemplate<String, SessionCheck> redisTemplate) {
+        this.settingsService = settingsService;
+        this.tokenRepository = tokenRepository;
+        this.profileRepository = profileRepository;
+        this.userService = userService;
+        this.redisTemplate = redisTemplate;
+    }
 
     /**
      * 设置指定角色的所有令牌临时失效

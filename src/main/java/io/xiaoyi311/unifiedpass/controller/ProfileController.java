@@ -5,7 +5,6 @@ import io.xiaoyi311.unifiedpass.annotation.Permission;
 import io.xiaoyi311.unifiedpass.entity.Cape;
 import io.xiaoyi311.unifiedpass.entity.User;
 import io.xiaoyi311.unifiedpass.service.ProfileService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +25,11 @@ import java.util.Map;
 public class ProfileController {
     final BigDecimal PAGE_SIZE = BigDecimal.valueOf(4);
 
-    @Autowired
-    ProfileService profileService;
+    final ProfileService profileService;
+
+    public ProfileController(ProfileService profileService) {
+        this.profileService = profileService;
+    }
 
     /**
      * 设置角色信息
@@ -47,6 +49,24 @@ public class ProfileController {
     }
 
     /**
+     * 设置角色信息
+     * @param data 信息
+     * @return OK
+     */
+    @PostMapping("setInfo/{uuid}")
+    @Permission(true)
+    public HttpStatus setInfoTo(@RequestBody JSONObject data, User user, @PathVariable(required = false) String uuid){
+        profileService.setInfo(
+                user,
+                uuid,
+                (String) data.getOrDefault("model", ""),
+                (String) data.getOrDefault("username", ""),
+                (String) data.getOrDefault("cape", "none")
+        );
+        return HttpStatus.NO_CONTENT;
+    }
+
+    /**
      * 上传皮肤
      * @param file 文件
      * @param user 用户
@@ -56,6 +76,19 @@ public class ProfileController {
     @Permission
     public HttpStatus uploadSkin(MultipartFile file, User user){
         profileService.uploadSkin(file, user);
+        return HttpStatus.NO_CONTENT;
+    }
+
+    /**
+     * 给指定用户上传皮肤
+     * @param file 文件
+     * @param user 用户
+     * @return 204
+     */
+    @PostMapping("uploadSkin/{uuid}")
+    @Permission(true)
+    public HttpStatus uploadSkin(MultipartFile file, User user, @PathVariable(required = false) String uuid){
+        profileService.uploadSkin(file, uuid, user);
         return HttpStatus.NO_CONTENT;
     }
 

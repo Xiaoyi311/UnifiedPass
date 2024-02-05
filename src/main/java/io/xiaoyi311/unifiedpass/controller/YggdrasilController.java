@@ -7,7 +7,6 @@ import io.xiaoyi311.unifiedpass.entity.yggdrasil.YggdrasilProfile;
 import io.xiaoyi311.unifiedpass.service.SettingsService;
 import io.xiaoyi311.unifiedpass.service.YggdrasilService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +20,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/yggdrasil")
 public class YggdrasilController {
-    @Autowired
-    YggdrasilService yggdrasilService;
+    final YggdrasilService yggdrasilService;
+    final SettingsService settingsService;
 
-    @Autowired
-    SettingsService settingsService;
+    public YggdrasilController(YggdrasilService yggdrasilService, SettingsService settingsService) {
+        this.yggdrasilService = yggdrasilService;
+        this.settingsService = settingsService;
+    }
 
     /**
      * 服务器信息<br>

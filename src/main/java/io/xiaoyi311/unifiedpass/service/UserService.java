@@ -11,10 +11,10 @@ import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,16 +31,17 @@ public class UserService {
     static final int LOGIN_FAIL_BAN = 5;
     static final int LOGIN_FAIL_BAN_TIME = 60 * 60 * 1000;
 
-    @Autowired
-    UserRepository userTable;
-
-    @Autowired
-    ProfileRepository profileRepository;
-
-    @Autowired
-    RedisTemplate<String, String> redisTemplate;
+    final UserRepository userTable;
+    final ProfileRepository profileRepository;
+    final RedisTemplate<String, String> redisTemplate;
 
     Map<String, BanUser> banUserList = new HashMap<>();
+
+    public UserService(UserRepository userTable, ProfileRepository profileRepository, RedisTemplate<String, String> redisTemplate) {
+        this.userTable = userTable;
+        this.profileRepository = profileRepository;
+        this.redisTemplate = redisTemplate;
+    }
 
     /**
      * 由 Session 获取用户
@@ -89,7 +90,7 @@ public class UserService {
      * @param user 用户
      */
     public void setInfo(String username, String passwordOld, String passwordNew, User user){
-        if(username.length() <= 5 || username.length() > 20 || !OtherUtil.isValidStr(username)){
+        if(username.length() <= 5 || username.length() > 20 || OtherUtil.isSuccessStr(username)){
             throw new UserError("lang:user.username_invalid");
         }
 
@@ -145,6 +146,27 @@ public class UserService {
     }
 
     /**
+     * 创建 UVS 验证码
+     * @param uuid 正版 UUID
+     * @param user 用户
+     * @return UVS 验证码
+     */
+     public Integer createUvs(String uuid, User user){
+         if(uuid.length() != 32){
+             throw new UserError("lang:user.uuid_invalid");
+         }
+
+         if(userTable.existsUserByMojang(uuid)){
+            throw new UserError("lang:user.exist");
+         }
+
+         int code = (int) Math.round((Math.random() * 9 + 1 ) * 100000);
+         redisTemplate.opsForValue().set("authCode:" + code, uuid, Duration.ofMinutes(5));
+         log.info("Create UVS " + uuid + ": " + code + " <- " + user.getId());
+         return code;
+     }
+
+    /**
      * 添加用户错误次数
      * @param username 用户名
      * @param request 请求
@@ -187,7 +209,7 @@ public class UserService {
      * 用户用户名与密码检查
      */
     private void userUpCheck(String username, String password){
-        if(username.length() <= 5 || username.length() > 20 || !OtherUtil.isValidStr(username)){
+        if(username.length() <= 5 || username.length() > 20 || OtherUtil.isSuccessStr(username)){
             throw new UserError("lang:user.username_invalid");
         }
 

@@ -8,8 +8,6 @@ import io.xiaoyi311.unifiedpass.entity.User;
 import io.xiaoyi311.unifiedpass.entity.UserError;
 import io.xiaoyi311.unifiedpass.entity.yggdrasil.YggdrasilProfile;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +16,10 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * 角色服务
@@ -27,53 +28,87 @@ import java.util.*;
 @Service
 @Slf4j
 public class ProfileService {
-    @Autowired
-    YggdrasilService yggdrasilService;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    CapeRepository capeRepository;
+    final YggdrasilService yggdrasilService;
+    final UserRepository userRepository;
+    final CapeRepository capeRepository;
 
     /**
-     * 设置用户信息
+     * 实例化角色服务
+     */
+    public ProfileService(YggdrasilService yggdrasilService, UserRepository userRepository, CapeRepository capeRepository) {
+        this.yggdrasilService = yggdrasilService;
+        this.userRepository = userRepository;
+        this.capeRepository = capeRepository;
+    }
+
+    /**
+     * 设置角色信息
      * @param user 用户
-     * @param model_in 模型
-     * @param username_in 用户名
+     * @param modelIn 模型
+     * @param usernameIn 用户名
      * @param cape 披风
      */
-    public void setInfo(User user, String model_in, String username_in, String cape){
+    public void setInfo(User user, String modelIn, String usernameIn, String cape){
         YggdrasilProfile profile = yggdrasilService.getProfile(user.getProfile());
         if(profile != null){
-            String model = Objects.equals(model_in, "") ? profile.getModel() : model_in;
-            String username = Objects.equals(username_in, "") ? profile.getName() : username_in;
-
-            if(!Objects.equals(model, "default") && !Objects.equals(model, "slim")){
-                throw new UserError("lang:profile.unknown_model");
-            }
-
-            List<String> capes = new ArrayList<>(List.of(profile.getCapes().split(",")));
-            List<String> result = new ArrayList<>();
-            if(!capes.contains(cape)){
-                throw new UserError("lang:profile.unknown_cape");
-            }
-            capes.remove(cape);
-            result.add(cape);
-            result.addAll(capes);
-
-            if(!Objects.equals(username, profile.getName())){
-                profile.setName(username);
-                yggdrasilService.setTempInvalid(profile.getUuid());
-            }
-
-            profile.setCapes(String.join(",", result));
-            profile.setModel(model);
-            yggdrasilService.saveProfile(profile);
+            String model = Objects.equals(modelIn, "") ? profile.getModel() : modelIn;
+            String username = Objects.equals(usernameIn, "") ? profile.getName() : usernameIn;
+            setInfo(profile, model, username, cape);
             log.info("Change Profile Info: {} -> [{}, {}, {}]", user.getId(), model, username, cape);
         }else{
             throw new UserError("lang:server.unknown_profile");
         }
+    }
+
+    /**
+     * 设置指定角色信息
+     * @param user 用户
+     * @param uuid 角色 UUID
+     * @param modelIn 模型
+     * @param usernameIn 用户名
+     * @param cape 披风
+     */
+    public void setInfo(User user, String uuid, String modelIn, String usernameIn, String cape){
+        YggdrasilProfile profile = yggdrasilService.getProfile(uuid);
+        if(profile != null){
+            String model = Objects.equals(modelIn, "") ? profile.getModel() : modelIn;
+            String username = Objects.equals(usernameIn, "") ? profile.getName() : usernameIn;
+            setInfo(profile, model, username, cape);
+            log.info("Change Profile Info: {}: {} -> [{}, {}, {}]", user.getId(), uuid, model, username, cape);
+        }else{
+            throw new UserError("lang:server.unknown_profile");
+        }
+    }
+
+    /**
+     * 设置角色信息
+     * @param profile 角色
+     * @param model 模型
+     * @param username 用户名
+     * @param cape 披风
+     */
+    private void setInfo(YggdrasilProfile profile, String model, String username, String cape){
+        if(!Objects.equals(model, "default") && !Objects.equals(model, "slim")){
+            throw new UserError("lang:profile.unknown_model");
+        }
+
+        List<String> capes = new ArrayList<>(List.of(profile.getCapes().split(",")));
+        List<String> result = new ArrayList<>();
+        if(!capes.contains(cape)){
+            throw new UserError("lang:profile.unknown_cape");
+        }
+        capes.remove(cape);
+        result.add(cape);
+        result.addAll(capes);
+
+        if(!Objects.equals(username, profile.getName())){
+            profile.setName(username);
+            yggdrasilService.setTempInvalid(profile.getUuid());
+        }
+
+        profile.setCapes(String.join(",", result));
+        profile.setModel(model);
+        yggdrasilService.saveProfile(profile);
     }
 
     /**
@@ -91,36 +126,78 @@ public class ProfileService {
         }
 
         try {
-            BufferedImage bi = ImageIO.read(file.getInputStream());
-            if(bi == null){
-                throw new UserError("lang:upload.noImg");
-            }
-
-            if ((bi.getWidth() % 64 != 0 || bi.getHeight() % 64 != 0) || (bi.getWidth() % 32 != 0 || bi.getHeight() % 32 != 0)) {
-                throw new UserError("lang:upload.unSafe");
-            }
-
-            File folder = new File(System.getProperty("user.dir"), "texture");
-            folder.mkdirs();
-
-            YggdrasilProfile profile = yggdrasilService.getProfile(user.getProfile());
-            if(profile.getSkin() != null){
-                File old = new File(folder, profile.getSkin());
-                if(old.exists()){
-                    old.delete();
-                }
-            }
-
-            String filename = OtherUtil.sha256(UUID.randomUUID().toString());
-            File save = new File(folder, filename);
-            file.transferTo(save);
-
-            profile.setSkin(filename);
-            yggdrasilService.saveProfile(profile);
+            checkSkin(file);
+            String filename = writeSkin(file, user.getProfile());
             log.info("Upload Skin: {} -> {}", user.getId(), filename);
         } catch (IOException e) {
             throw new UserError("lang:upload.fail");
         }
+    }
+
+    /**
+     * 上传皮肤
+     * @param file 文件
+     * @param uuid 角色 UUID
+     * @param user 用户
+     */
+    public void uploadSkin(MultipartFile file, String uuid, User user){
+        if(file == null || file.isEmpty()){
+            throw new UserError("lang:upload.empty");
+        }
+
+        if(!Objects.equals(file.getContentType(), "image/png")){
+            throw new UserError("lang:upload.unSupport_type");
+        }
+
+        try {
+            checkSkin(file);
+            String filename = writeSkin(file, uuid);
+            log.info("Upload Skin: {}: {} -> {}", user.getId(), uuid, filename);
+        } catch (IOException e) {
+            throw new UserError("lang:upload.fail");
+        }
+    }
+
+    /**
+     * 检查皮肤合法性
+     * @param file 皮肤数据
+     */
+    private void checkSkin(MultipartFile file) throws IOException {
+        BufferedImage bi = ImageIO.read(file.getInputStream());
+        if(bi == null){
+            throw new UserError("lang:upload.noImg");
+        }
+
+        if ((bi.getWidth() % 64 != 0 || bi.getHeight() % 64 != 0) || (bi.getWidth() % 32 != 0 || bi.getHeight() % 32 != 0)) {
+            throw new UserError("lang:upload.unSafe");
+        }
+    }
+
+    /**
+     * 写皮肤入磁盘
+     * @param file 皮肤数据
+     * @param uuid 角色 UUID
+     * @return 文件名
+     */
+    private String writeSkin(MultipartFile file, String uuid) throws IOException {
+        File folder = new File(System.getProperty("user.dir"), "texture");
+        folder.mkdirs();
+
+        YggdrasilProfile profile = yggdrasilService.getProfile(uuid);
+        if(profile.getSkin() != null){
+            File old = new File(folder, profile.getSkin());
+            if(old.exists()){
+                old.delete();
+            }
+        }
+
+        String filename = OtherUtil.sha256(UUID.randomUUID().toString());
+        File save = new File(folder, filename);
+        file.transferTo(save);
+
+        profile.setSkin(filename);
+        yggdrasilService.saveProfile(profile);
+        return filename;
     }
 
     /**

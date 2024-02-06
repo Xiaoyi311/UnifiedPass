@@ -97,8 +97,7 @@ public class AuthController {
     }
 
     /**
-     * 账户信息<br>
-     * 权限：普通
+     * 账户信息
      * @param user 用户
      * @return 用户信息序列化
      */
@@ -109,6 +108,20 @@ public class AuthController {
     ){
         return user;
     }
+
+    /**
+     * 获取指定角色的用户信息
+     * @param uuid 用户 Uuid
+     * @return 用户信息序列化
+     */
+    @Permission(true)
+    @GetMapping("info/profile/{uuid}")
+    public User info(
+            @PathVariable(required = false) String uuid
+    ){
+        return userService.getUserByProfile(uuid);
+    }
+
 
     /**
      * 创建 Uvs 验证码

@@ -44,6 +44,20 @@ public class UserService {
     }
 
     /**
+     * 由角色 UUID 获取用户
+     * @param uuid 角色 UUID
+     * @return 用户
+     */
+    public User getUserByProfile(String uuid){
+        YggdrasilProfile profile = profileRepository.getYggdrasilProfileByUuid(uuid);
+        if(profile == null){
+            throw new UserError("lang:user.not_exist");
+        }
+
+        return userTable.getUserById(profile.user);
+    }
+
+    /**
      * 由 Session 获取用户
      * @param request 请求
      * @return 用户

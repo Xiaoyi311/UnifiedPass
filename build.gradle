@@ -84,7 +84,7 @@ task copyConfigFile(type: Copy) {
 
 // 将依赖包复制到lib目录
 task copyJar(type: Copy, dependsOn: 'clearJar') {
-    from configurations.compileClasspath
+    from configurations.runtimeClasspath
     into "$buildDir/libs/lib"
 }
 
@@ -106,7 +106,7 @@ tasks.register('makeJar', Jar) {
     manifest {
         attributes "Manifest-Version": 1.0,
                 'Main-Class': 'io.xiaoyi311.unifiedpass.UnifiedPassApplication',
-                'Class-Path': configurations.compileClasspath.files.collect { "lib/$it.name" }.join(' ')
+                'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
     }
 
 }
@@ -127,7 +127,7 @@ tasks.register('makeProJar', Jar) {
     manifest {
         attributes "Manifest-Version": 1.0,
                 'Main-Class': 'io.xiaoyi311.unifiedpass.UnifiedPassApplication',
-                'Class-Path': configurations.compileClasspath.files.collect { "lib/$it.name" }.join(' ')
+                'Class-Path': configurations.runtimeClasspath.files.collect { "lib/$it.name" }.join(' ')
     }
 
     doLast {

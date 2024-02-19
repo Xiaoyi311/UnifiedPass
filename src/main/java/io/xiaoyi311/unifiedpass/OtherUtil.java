@@ -101,14 +101,14 @@ public class OtherUtil {
             } else {
                 data.setStatus(500);
                 if(debug){
-                    log.trace("Servlet Exception", e);
+                    log.error("Servlet Exception", e);
                 }
                 data.setData(e.getMessage());
             }
         } else if (body instanceof Exception e) {
             data.setStatus(500);
             if(debug){
-                log.trace("Servlet Exception", e);
+                log.error("Servlet Exception", e);
             }
             data.setData(e.getMessage());
         } else if (body instanceof HttpStatus s) {
@@ -135,7 +135,7 @@ public class OtherUtil {
             privateKeyStr = privateKeyStr.replaceAll("\n", "");
             privateKeyStr = privateKeyStr.replace("-----BEGIN PRIVATE KEY-----", "");
             privateKeyStr = privateKeyStr.replace("-----END PRIVATE KEY-----", "");
-            byte[] decodedBytes = Base64.getDecoder().decode(privateKeyStr);
+            byte[] decodedBytes = Base64.getMimeDecoder().decode(privateKeyStr);
             PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decodedBytes);
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PrivateKey privateKey = keyFactory.generatePrivate(spec);
@@ -144,6 +144,7 @@ public class OtherUtil {
             signature.update(data.getBytes());
             return Base64.getEncoder().encodeToString(signature.sign());
         } catch (Exception e){
+            log.error("RSA Sign Error", e);
             return "=== ERROR SIGN SYSTEM ===";
         }
     }
@@ -168,6 +169,7 @@ public class OtherUtil {
             }
             return stringBuilder.toString();
         }catch (Exception e){
+            log.trace("SHA256 ENCODE Error", e);
             return "=== ERROR ENCODE SHA256 ===";
         }
     }

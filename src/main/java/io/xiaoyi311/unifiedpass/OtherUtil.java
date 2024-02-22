@@ -225,4 +225,26 @@ public class OtherUtil {
 
         return JSON.parseObject(response.body());
     }
+
+    /**
+     * GET 请求
+     * @param url 地址
+     * @return 返回结果
+     */
+    public static String getReq(String url){
+        HttpClient cli = HttpClient.newHttpClient();
+        HttpResponse<String> response;
+        try {
+            response = cli.send(
+                    HttpRequest.newBuilder()
+                            .uri(URI.create(url))
+                            .GET()
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+        } catch (IOException | InterruptedException e) {
+            return null;
+        }
+        return response.body();
+    }
 }

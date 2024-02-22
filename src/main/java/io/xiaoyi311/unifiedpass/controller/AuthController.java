@@ -31,12 +31,19 @@ public class AuthController {
     @PostMapping("register")
     @GoogleVerify
     public HttpStatus register(
-            @RequestBody JSONObject data
+            @RequestBody JSONObject data,
+            HttpServletRequest request
     ){
         userService.register(
                 (String) data.getOrDefault("username", ""),
                 (String) data.getOrDefault("password", ""),
                 (String) data.getOrDefault("code", "")
+        );
+        userService.login(
+                (String) data.getOrDefault("username", ""),
+                (String) data.getOrDefault("password", ""),
+                false,
+                request
         );
         return HttpStatus.NO_CONTENT;
     }

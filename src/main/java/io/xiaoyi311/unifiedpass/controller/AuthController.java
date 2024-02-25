@@ -76,7 +76,7 @@ public class AuthController {
      * @return OK
      */
     @PostMapping("login")
-    @GoogleVerify
+    //@GoogleVerify
     public ResponseData login(
             @RequestBody JSONObject data,
             HttpServletRequest request

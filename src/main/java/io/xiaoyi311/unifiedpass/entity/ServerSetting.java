@@ -32,6 +32,9 @@ public class ServerSetting implements Serializable {
     @Column
     public String value;
 
+    /**
+     * 服务器配置项
+     */
     public enum Settings{
         /**
          * 服务器名称
@@ -51,6 +54,11 @@ public class ServerSetting implements Serializable {
         /**
          * 私钥
          */
-        PrivateKey
+        PrivateKey,
+
+        /**
+         * 白名单
+         */
+        WhiteList
     }
 }

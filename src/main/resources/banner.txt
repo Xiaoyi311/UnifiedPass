@@ -10,5 +10,5 @@
 \<- Powered By Backrooms MC IT Group ->/
  \<-   Player Unified Pass System   ->/
   \<-      Author: Xiaoyi311       ->/
-   \<-     Version: v1.3.0        ->/
+   \<-     Version: v1.3.2        ->/
     |==============================|

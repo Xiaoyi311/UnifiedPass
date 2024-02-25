@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -313,6 +314,18 @@ public class YggdrasilService {
     ){
         try{
             User user = userService.banUserCheck(username);
+
+            String data = settingsService.get(ServerSetting.Settings.WhiteList).getValue();
+            if(!data.isEmpty()){
+                String[] whitelist = data.split(",");
+                if (Objects.equals(whitelist[0], "off")) {
+                    log.info("Yggdrasil Login Canceled: " + username);
+                    throw YggdrasilError.Errors.AUTH_FAILED.getMsg();
+                } else if (!Arrays.asList(whitelist).contains(username)){
+                    log.info("Yggdrasil Login Not Allowed: " + username);
+                    throw YggdrasilError.Errors.AUTH_FAILED.getMsg();
+                }
+            }
 
             if(Objects.equals(user.getPassword(), OtherUtil.sha256(password))){
                 if(tokenRepository.countByUser(user.getId()) >= USER_TOKEN_MAX){

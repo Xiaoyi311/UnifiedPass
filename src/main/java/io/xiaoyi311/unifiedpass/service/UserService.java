@@ -3,6 +3,7 @@ package io.xiaoyi311.unifiedpass.service;
 import io.xiaoyi311.unifiedpass.OtherUtil;
 import io.xiaoyi311.unifiedpass.dao.ProfileRepository;
 import io.xiaoyi311.unifiedpass.dao.UserRepository;
+import io.xiaoyi311.unifiedpass.entity.ServerSetting;
 import io.xiaoyi311.unifiedpass.entity.User;
 import io.xiaoyi311.unifiedpass.entity.UserError;
 import io.xiaoyi311.unifiedpass.entity.yggdrasil.YggdrasilProfile;
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -33,14 +35,16 @@ public class UserService {
 
     final UserRepository userTable;
     final ProfileRepository profileRepository;
+    final SettingsService settingsService;
     final RedisTemplate<String, String> redisTemplate;
 
     Map<String, BanUser> banUserList = new HashMap<>();
 
-    public UserService(UserRepository userTable, ProfileRepository profileRepository, RedisTemplate<String, String> redisTemplate) {
+    public UserService(UserRepository userTable, ProfileRepository profileRepository, RedisTemplate<String, String> redisTemplate, SettingsService settingsService) {
         this.userTable = userTable;
         this.profileRepository = profileRepository;
         this.redisTemplate = redisTemplate;
+        this.settingsService = settingsService;
     }
 
     /**
@@ -82,6 +86,18 @@ public class UserService {
         User user = banUserCheck(username);
 
         userUpCheck(username, password);
+
+        String data = settingsService.get(ServerSetting.Settings.WhiteList).getValue();
+        if(!data.isEmpty()){
+            String[] whitelist = data.split(",");
+            if (Objects.equals(whitelist[0], "off")) {
+                log.info("Login Canceled: " + username);
+                throw new UserError("lang:login.disable");
+            } else if (!Arrays.asList(whitelist).contains(username)){
+                log.info("Login Not Allowed: " + username);
+                throw new UserError("lang:login.not_whitelist");
+            }
+        }
 
         if(user != null && Objects.equals(user.getPassword(), OtherUtil.sha256(password))){
             log.info("User Login: " + username);

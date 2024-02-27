@@ -12,6 +12,8 @@ import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -26,6 +28,7 @@ import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -227,24 +230,60 @@ public class OtherUtil {
     }
 
     /**
-     * GET 请求
-     * @param url 地址
-     * @return 返回结果
+     * 生成数字和字母组合，字母区分大小写
+     * @param length 随机字符串的长度
+     * @return 随机字符串
      */
-    public static String getReq(String url){
-        HttpClient cli = HttpClient.newHttpClient();
-        HttpResponse<String> response;
-        try {
-            response = cli.send(
-                    HttpRequest.newBuilder()
-                            .uri(URI.create(url))
-                            .GET()
-                            .build(),
-                    HttpResponse.BodyHandlers.ofString()
-            );
-        } catch (IOException | InterruptedException e) {
-            return null;
+    public static String randomString(final int length) {
+        StringBuilder randomSb = new StringBuilder(length);
+        Random random = new Random();
+        for (int i = 0; i < length; i++) {
+            String charOrNum = random.nextInt(2) % 2 == 0 ? "char" : "num";
+            if ("char".equals(charOrNum)) {
+                int choice = random.nextInt(2) % 2 == 0 ? 65 : 97;
+                randomSb.append((char) (choice + random.nextInt(26)));
+            } else {
+                randomSb.append(random.nextInt(10));
+            }
         }
-        return response.body();
+        return randomSb.toString();
+    }
+
+    /**
+     * AES 加密
+     * @param sSrc 原文本
+     * @param sKey 密钥 16位
+     * @return 加密后
+     */
+    public static String aesEncrypt(String sSrc, String sKey) {
+        try{
+            byte[] raw = sKey.getBytes(StandardCharsets.UTF_8);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(raw, "AES"));
+            byte[] encrypted = cipher.doFinal(sSrc.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(encrypted);
+        } catch (Exception e){
+            log.trace("AES ENCODE Error", e);
+            return "=== ERROR ENCODE AES ===";
+        }
+    }
+
+    /**
+     * AES 解密
+     * @param sSrc 密文
+     * @param sKey 密钥 16位
+     * @return 解密后
+     */
+    public static String aesDecrypt(String sSrc, String sKey) {
+        try{
+            byte[] raw = sKey.getBytes(StandardCharsets.UTF_8);
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(raw, "AES"));
+            byte[] original = cipher.doFinal(Base64.getDecoder().decode(sSrc));
+            return new String(original, StandardCharsets.UTF_8);
+        } catch (Exception e){
+            log.trace("AES DECODE Error", e);
+            return "=== ERROR DECODE AES ===";
+        }
     }
 }

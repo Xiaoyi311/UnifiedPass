@@ -34,7 +34,7 @@ public class GoogleVerifyAspect {
     }
 
     @Around("@annotation(verify)")
-    public Object beforeMethod(ProceedingJoinPoint joinPoint, GoogleVerify verify) throws Throwable{
+    public Object aroundMethod(ProceedingJoinPoint joinPoint, GoogleVerify verify) throws Throwable{
         if(isDev){
             log.warn("!!!!!!!!=Google Verify is disabled in dev mode=!!!!!!!!");
             return joinPoint.proceed();

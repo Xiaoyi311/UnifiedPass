@@ -48,6 +48,15 @@ public class UserService {
     }
 
     /**
+     * 由 UUID 获取用户
+     * @param id UUID
+     * @return 用户
+     */
+    public User getUserById(String id){
+        return userTable.getUserById(id);
+    }
+
+    /**
      * 由角色 UUID 获取用户
      * @param uuid 角色 UUID
      * @return 用户
@@ -86,18 +95,6 @@ public class UserService {
         User user = banUserCheck(username);
 
         userUpCheck(username, password);
-
-        String data = settingsService.get(ServerSetting.Settings.WhiteList).getValue();
-        if(!data.isEmpty()){
-            String[] whitelist = data.split(",");
-            if (Objects.equals(whitelist[0], "off")) {
-                log.info("Login Canceled: " + username);
-                throw new UserError("lang:login.disable");
-            } else if (!Arrays.asList(whitelist).contains(username)){
-                log.info("Login Not Allowed: " + username);
-                throw new UserError("lang:login.not_whitelist");
-            }
-        }
 
         if(user != null && Objects.equals(user.getPassword(), OtherUtil.sha256(password))){
             log.info("User Login: " + username);

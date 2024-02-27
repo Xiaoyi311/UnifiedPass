@@ -76,7 +76,7 @@ public class AuthController {
      * @return OK
      */
     @PostMapping("login")
-    //@GoogleVerify
+    @GoogleVerify
     public ResponseData login(
             @RequestBody JSONObject data,
             HttpServletRequest request
@@ -108,7 +108,7 @@ public class AuthController {
      * @param user 用户
      * @return 用户信息序列化
      */
-    @Permission
+    @Permission(oauth = {"auth.info"})
     @GetMapping("info")
     public User info(
             User user

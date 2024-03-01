@@ -30,4 +30,11 @@ public interface ProfileRepository extends JpaRepository<YggdrasilProfile, Strin
      * @return 角色列表
      */
     List<YggdrasilProfile> findYggdrasilProfilesByCapesContains(String cape);
+
+    /**
+     * 由角色名获取角色
+     * @param name 角色名
+     * @return 角色
+     */
+    YggdrasilProfile getYggdrasilProfileByName(String name);
 }

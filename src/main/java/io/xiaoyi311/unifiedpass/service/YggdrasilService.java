@@ -181,6 +181,17 @@ public class YggdrasilService {
     }
 
     /**
+     * 从名称获取角色
+     * @param name 角色名称
+     * @return 角色
+     */
+    public YggdrasilProfile getProfileFromName(
+            String name
+    ){
+        return profileRepository.getYggdrasilProfileByName(name);
+    }
+
+    /**
      * 注销用户所有 Token
      * @param username 用户名
      * @param password 密码

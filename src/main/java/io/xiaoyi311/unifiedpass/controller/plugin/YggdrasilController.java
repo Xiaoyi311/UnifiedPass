@@ -1,4 +1,4 @@
-package io.xiaoyi311.unifiedpass.controller;
+package io.xiaoyi311.unifiedpass.controller.plugin;
 
 import com.alibaba.fastjson.JSONObject;
 import io.xiaoyi311.unifiedpass.entity.ServerSetting;

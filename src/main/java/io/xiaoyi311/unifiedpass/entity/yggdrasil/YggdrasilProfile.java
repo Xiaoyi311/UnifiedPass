@@ -127,14 +127,22 @@ public class YggdrasilProfile implements Serializable {
             textures.put("SKIN", skin);
         }
 
-        if(!Objects.equals(this.capes.split(",")[0], "NONE")){
+        if(!Objects.equals(getUsingCape(), "NONE")){
             JSONObject cape = new JSONObject();
-            cape.put("url", website + "/textures/" + this.capes.split(",")[0]);
+            cape.put("url", website + "/textures/" + getUsingCape());
 
             textures.put("CAPE", cape);
         }
 
         root.put("textures", textures);
         return root;
+    }
+
+    /**
+     * 获取正在使用的披风
+     * @return 披风
+     */
+    public String getUsingCape(){
+        return capes.split(",")[0];
     }
 }

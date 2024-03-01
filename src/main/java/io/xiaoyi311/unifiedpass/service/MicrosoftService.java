@@ -23,9 +23,11 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 微软服务
  * @author xiaoyi311
+ * @deprecated Mojang 不通过 API 申请
  */
 @Service
 @Slf4j
+@Deprecated
 public class MicrosoftService {
     final RedisTemplate<String, String> redisTemplate;
 

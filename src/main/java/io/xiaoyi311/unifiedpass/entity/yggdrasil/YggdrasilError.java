@@ -83,7 +83,7 @@ public class YggdrasilError extends Error{
         PROFILE_NOT_FOUND(new YggdrasilError(
                 403,
                 "ForbiddenOperationException",
-                "Profile does not belong to this token",
+                "Profile does not belong to this token.",
                 null
         )),
 

@@ -51,7 +51,7 @@ public class OAuthApp implements Serializable {
      * 允许申请权限
      */
     @Column
-    String permission = "user.info";
+    String permission = "auth.info";
 
     /**
      * 应用名称
